@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hospital Management System - Frontend</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="authScreen" class="auth">
+    <div class="auth-card">
+      <h2 id="authTitle">Login</h2>
+
+      <form id="loginForm">
+        <label>Email</label>
+        <input type="email" required />
+
+        <label>Password</label>
+        <input type="password" required />
+
+        <button class="btn" style="width:100%;margin-top:12px" type="submit">Login</button>
+      </form>
+
+      <form id="registerForm" style="display:none">
+        <label>Name</label>
+        <input type="text" required />
+
+        <label>Email</label>
+        <input type="email" required />
+
+        <label>Password</label>
+        <input type="password" required />
+
+        <button class="btn" style="width:100%;margin-top:12px" type="submit">Create Account</button>
+      </form>
+
+      <div id="switchAuth" class="link">
+        Don't have an account? <span>Register</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <aside class="sidebar" aria-label="Navigation">
+      <div class="brand">
+        <div class="logo">HM</div>
+        <div>
+          <h1>Hospicare</h1>
+          <div class="muted" style="font-size:13px">Admin Dashboard</div>
+        </div>
+      </div>
+
+      <nav class="nav" role="navigation">
+        <a href="#" class="active" data-view="dashboard">🏠 Dashboard</a>
+        <a href="#" data-view="patients">🧑‍⚕️ Patients</a>
+        <a href="#" data-view="appointments">📅 Appointments</a>
+        <a href="#" data-view="staff">👩‍⚕️ Staff</a>
+        <a href="#" data-view="billing">💳 Billing</a>
+        <a href="#" data-view="reports">📊 Reports</a>
+        <a href="#" data-view="settings">⚙️ Settings</a>
+      </nav>
+
+      <div style="margin-top:18px">
+        <div class="muted" style="font-size:13px;margin-bottom:8px">Quick actions</div>
+        <button class="btn" id="newPatientBtn">➕ New Patient</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="search">
+          <input id="globalSearch" placeholder="Search patients, staff, appointments..." />
+          <div class="actions">
+            <button class="btn secondary" id="filterBtn">Filters</button>
+            <button class="btn" id="exportBtn">Export</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="text-align:right">
+            <div style="font-weight:700">Admin</div>
+            <div class="muted" style="font-size:12px">hospicare@example.com</div>
+          </div>
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#f97316);display:grid;place-items:center;color:white">A</div>
+        </div>
+      </div>
+
+      <!-- VIEW SECTIONS -->
+      <section id="dashboard" class="view">
+        <div class="grid">
+          <div class="card">
+            <h3>Patients</h3>
+            <div class="kpi" id="kpiPatients">—</div>
+            <div class="muted">Total registered patients</div>
+          </div>
+
+          <div class="card">
+            <h3>Today's Appointments</h3>
+            <div class="kpi" id="kpiAppts">—</div>
+            <div class="muted">Upcoming today</div>
+          </div>
+
+          <div class="card">
+            <h3>Staff</h3>
+            <div class="kpi" id="kpiStaff">—</div>
+            <div class="muted">Active staff members</div>
+          </div>
+
+          <div class="card">
+            <h3>Pending Bills</h3>
+            <div class="kpi" id="kpiBills">—</div>
+            <div class="muted">Unpaid invoices</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <h3>Upcoming Appointments</h3>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr><th>Time</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Status</th></tr>
+              </thead>
+              <tbody id="apptTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Recent Patients</h3>
+            <div style="overflow:auto;max-height:220px">
+              <table>
+                <thead><tr><th>Name</th><th>Age</th><th>Phone</th><th>Action</th></tr></thead>
+                <tbody id="recentPatients"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Quick Reports</h3>
+            <div style="display:grid;gap:8px">
+              <div class="muted">Admissions (7d)</div>
+              <div class="pill">+12 vs last week</div>
+              <div class="space"></div>
+              <div class="muted">Revenue (30d)</div>
+              <div class="pill">$24,600</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="patients" class="view" style="display:none">
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3>Patients</h3>
+            <div>
+              <button class="btn secondary" id="importBtn">Import CSV</button>
+              <button class="btn" id="addPatientTop">Add Patient</button>
+            </div>
+          </div>
+
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>Age</th><th>Phone</th><th>Last Visit</th><th>Action</th></tr>
+              </thead>
+              <tbody id="patientsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Add / Edit Patient</h3>
+          <form id="patientForm">
+            <div class="form-row">
+              <div>
+                <label>Name</label>
+                <input name="name" required />
+              </div>
+              <div>
+                <label>Phone</label>
+                <input name="phone" />
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top:10px">
+              <div>
+                <label>Date of Birth</label>
+                <input name="dob" type="date" />
+              </div>
+              <div>
+                <label>Gender</label>
+                <select name="gender">
+                  <option value="">Select</option>
+                  <option>Female</option>
+                  <option>Male</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top:10px">
+              <label>Notes</label>
+              <textarea name="notes" rows="4"></textarea>
+            </div>
+
+            <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+              <button type="reset" class="btn secondary">Reset</button>
+              <button class="btn" type="submit">Save Patient</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="appointments" class="view" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h2>Appointments</h2>
+          <button class="btn" id="newAppt">New Appointment</button>
+        </div>
+
+        <!-- Appointment Modal -->
+        <div id="apptModal" class="modal hidden" aria-hidden="true">
+          <div class="modal-content">
+            <h3>Create Appointment</h3>
+
+            <form id="apptForm">
+              <div class="form-grid">
+                <div class="form-row">
+                  <div>
+                    <label>Date</label>
+                    <input name="date" type="date" required>
+                  </div>
+                  <div>
+                    <label>Time</label>
+                    <input name="time" type="time" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div>
+                    <label>Patient</label>
+                    <select name="patient" id="patientSelect" required></select>
+                  </div>
+                  <div>
+                    <label>Doctor</label>
+                    <select name="doctor" id="doctorSelect" required></select>
+                  </div>
+                </div>
+
+                <label>Department</label>
+                <select name="dept">
+                  <option>General</option>
+                  <option>Cardiology</option>
+                  <option>Pediatrics</option>
+                  <option>Neurology</option>
+                </select>
+
+                <label>Status</label>
+                <select name="status">
+                  <option>Confirmed</option>
+                  <option>Pending</option>
+                  <option>Cancelled</option>
+                </select>
+
+                <label>Notes</label>
+                <textarea name="notes" rows="3"></textarea>
+
+                <div class="btn-row" style="margin-top:10px">
+                  <button type="button" class="btn secondary" onclick="closeApptModal()">Cancel</button>
+                  <button class="btn" type="submit">Save Appointment</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px">
+          <div class="muted">Manage patient appointments</div>
+          <div>
+            <button class="btn secondary" id="calToggle">Calendar</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Status</th></tr>
+            </thead>
+            <tbody id="appointmentsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="staff" class="view" style="display:none">
+        <div class="card">
+          <h3>Staff Directory</h3>
+          <div style="overflow:auto">
+            <table>
+              <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Phone</th></tr></thead>
+              <tbody id="staffTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="billing" class="view" style="display:none">
+        <div class="card">
+          <h3>Billing & Invoices</h3>
+          <div style="overflow:auto">
+            <table>
+              <thead><tr><th>Invoice</th><th>Patient</th><th>Amount</th><th>Due</th><th>Status</th></tr></thead>
+              <tbody id="billingTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="reports" class="view" style="display:none">
+        <div class="card">
+          <h3>Reports</h3>
+          <p class="muted">Export clinical and financial reports (CSV / PDF).</p>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn secondary">Export Patients</button>
+            <button class="btn secondary">Export Appointments</button>
+            <button class="btn">Export Financials</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="view" style="display:none">
+        <div class="card">
+          <h3>Settings</h3>
+          <form id="settingsForm">
+            <div class="form-row">
+              <div>
+                <label>Facility name</label>
+                <input name="facility" value="City Hospital" />
+              </div>
+              <div>
+                <label>Timezone</label>
+                <select name="tz">
+                  <option>Asia/Kolkata</option>
+                  <option>UTC</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:8px">
+              <button class="btn" type="submit">Save Settings</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modalRoot" class="modal-backdrop" role="dialog" aria-modal="true" style="display:none">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
